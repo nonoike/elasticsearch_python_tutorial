@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>東京駅近郊トラベル施設検索アプリケーション</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<div class="application-body">
+    <a class="navbar-brand" href="/"><h3>東京駅近郊トラベル施設検索アプリケーション</h3></a>
+    <br>
+    <div class="search-form">
+        <form action="{{ url_for('show_results') }}" method="post">
+            <div class="form-group">
+                <label for="search_word">キーワード</label>
+                <input type="text" class="form-control" id="search_word" name="search_word" placeholder="施設名称または特色"
+                       value={{request_form.search_word}}>
+            </div>
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="col-lg-6">
+                        <label for="review_min">最低評価</label>
+                        <input type="text" class="form-control" id="review_min" name="review_min"
+                               value={{request_form.review_min}}>
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="review_max">最高評価</label>
+                        <input type="text" class="form-control" id="review_max" name="review_max"
+                               value={{request_form.review_max}}>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="col-lg-6">
+                        <label for="charge_min">最低最安料金</label>
+                        <input type="text" class="form-control" id="charge_min" name="charge_min"
+                               value={{request_form.charge_min}}>
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="charge_max">最高最安料金</label>
+                        <input type="text" class="form-control" id="charge_max" name="charge_max"
+                               value={{request_form.charge_max}}>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">検索</button>
+        </form>
+    </div>
+</div>
+
+
+検索結果 {{ result_num }}件
+
+{% for hotel in hotels %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-2">
+                <img src="{{hotel._source.hotelThumbnailUrl }}">
+            </div>
+            <div class="col-lg-10">
+                <a href={{hotel._source.hotelInformationUrl}}>
+                    <small>
+                        {% if hotel.highlight and hotel.highlight.hotelKanaName %}
+                        {{ hotel.highlight.hotelKanaName[0] | safe }}
+                        {% else %}
+                        {{ hotel._source.hotelKanaName }}
+                        {% endif %}
+                    </small>
+                    <h4 class="card-title">
+                        {% if hotel.highlight and hotel.highlight.hotelName %}
+                        {{ hotel.highlight.hotelName[0] | safe }}
+                        {% else %}
+                        {{ hotel._source.hotelName }}
+                        {% endif %}
+                    </h4>
+                </a>
+                <h5 class="card-title">レビュー平均: {{ hotel._source.reviewAverage or '-' }}</h5>
+                <h5 class="card-title">最安料金: {{ hotel._source.hotelMinCharge or '-' }}円</h5>
+                <p class="card-text">
+                    {% if hotel.highlight and hotel.highlight.hotelSpecial %}
+                    {{ hotel.highlight.hotelSpecial[0] | safe }}
+                    {% else %}
+                    {{ hotel._source.hotelSpecial }}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+投稿がありません
+{% endfor %}
+
+</body>
+</html>
