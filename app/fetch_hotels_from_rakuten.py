@@ -26,7 +26,7 @@ def main():
         time.sleep(SLEEP_SEC)
 
     with open('data/rakuten_hotels.json', 'w') as f:
-        json.dump(hotels, f)
+        json.dump(hotels, f, ensure_ascii=False, indent=4)
 
 
 def fetch_api_response_json(page: int) -> json:
